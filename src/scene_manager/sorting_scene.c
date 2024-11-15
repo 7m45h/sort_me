@@ -24,7 +24,6 @@ bool sscene_init(struct sorting_scene* sscene)
 {
     sscene->window = NULL;
     sscene->graph  = NULL;
-    sscene->runnig = false;
 
     sscene->window = window_create(DEFAULT_TITLE);
     if (!sscene->window)
@@ -59,6 +58,8 @@ bool sscene_init(struct sorting_scene* sscene)
 
     sscene->event_poll_interval = ONE_SEC_IN_MILI / sscene->window->refresh_rate;
     sscene->update_interval     = ONE_SEC_IN_MILI / DEFAULT_SORTING_SPEED;
+    sscene->sorted              = false;
+    sscene->runnig              = false;
 
     return false;
 }
