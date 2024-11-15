@@ -77,6 +77,7 @@ void sscene_deinit(struct sorting_scene* sscene)
 
 void sscene_exist(struct sorting_scene* sscene)
 {
+    bool error              = false;
     Uint64 frame_start_time = 0;
     Uint64 frame_duration   = 0;
     Uint64 event_ticker     = sscene->event_poll_interval;
@@ -91,7 +92,12 @@ void sscene_exist(struct sorting_scene* sscene)
         if (event_ticker > sscene->event_poll_interval)
         {
             event_ticker = 0;
-            sscene_handle_events(sscene);
+            error = sscene_handle_events(sscene);
+            if (error)
+            {
+                LOGG_FAILURE("sscene_handle_events");
+                break;
+            }
         }
         else
         {

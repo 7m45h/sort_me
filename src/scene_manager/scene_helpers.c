@@ -13,8 +13,10 @@
 #include "sorters.h"
 #include "sorting_scene.h"
 
-void sscene_handle_events(struct sorting_scene* sscene)
+bool sscene_handle_events(struct sorting_scene* sscene)
 {
+    bool error = false;
+
     while (SDL_PollEvent(&sscene->window->event))
     {
         switch (sscene->window->event.type)
@@ -28,6 +30,14 @@ void sscene_handle_events(struct sorting_scene* sscene)
             {
                 case SDLK_q:
                 sscene->runnig = false;
+                break;
+
+                case SDLK_f:
+                error = window_toggle_fullscreen(sscene->window);
+                if (error)
+                {
+                    LOGG_FAILURE("window_toggle_fullscreen");
+                }
                 break;
             }
             break;
@@ -46,6 +56,8 @@ void sscene_handle_events(struct sorting_scene* sscene)
             break;
         }
     }
+
+    return error;
 }
 
 void sscene_update_screen(struct sorting_scene* sscene)

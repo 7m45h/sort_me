@@ -1,8 +1,11 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_error.h>
+#include <SDL2/SDL_events.h>
+#include <SDL2/SDL_mouse.h>
 #include <SDL2/SDL_render.h>
 #include <SDL2/SDL_video.h>
 #include <errno.h>
+#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
@@ -25,6 +28,7 @@ struct window* window_create(const char* title)
 
     window->window   = NULL;
     window->renderer = NULL;
+    window->windowed = true;
 
     sdl_error = SDL_Init(SDL_INIT_TIMER | SDL_INIT_VIDEO | SDL_INIT_EVENTS);
     if (sdl_error)
@@ -73,4 +77,28 @@ void window_destroy(struct window* window)
     free(window);
 
     SDL_Quit();
+}
+
+bool window_toggle_fullscreen(struct window* window)
+{
+    int sdl_error    = 0;
+    bool to_windowed = !window->windowed;
+
+    sdl_error = SDL_SetWindowFullscreen(window->window, to_windowed ? 0 : SDL_WINDOW_FULLSCREEN);
+    if (sdl_error)
+    {
+        LOGG_ERROR("SDL_SetWindowFullscreen", sdl_error, SDL_GetError());
+        return true;
+    }
+
+    sdl_error = SDL_ShowCursor(to_windowed ? SDL_ENABLE : SDL_DISABLE);
+    if (sdl_error < 0)
+    {
+        LOGG_ERROR("SDL_ShowCursor", sdl_error, SDL_GetError());
+        return true;
+    }
+
+    window->windowed = to_windowed;
+
+    return false;
 }
