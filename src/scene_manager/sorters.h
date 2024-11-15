@@ -5,11 +5,17 @@
 
 #include "../int_array/int_array.h"
 
+enum SORTING_ALGO
+{
+    SALGO_NONE      = 0,
+    SALGO_INSERTION = 1
+};
+
 typedef struct
 {
     size_t current_index;
-    bool          sorted;
 } insertion_sort_state_t;
 
-void insertion_sort_step(struct int_array* iarr, insertion_sort_state_t* state);
-void insertion_sort_reset_state(insertion_sort_state_t* state);
+insertion_sort_state_t* insertion_sort_state_create(void);
+bool                    insertion_sort_step(struct int_array* iarr, void* _state);
+bool                    insertion_sort_reset_state(void* _state);

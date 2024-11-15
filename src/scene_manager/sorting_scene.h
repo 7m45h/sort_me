@@ -1,5 +1,6 @@
 #pragma once
 
+#include <SDL2/SDL.h>
 #include <SDL2/SDL_rect.h>
 #include <stdbool.h>
 
@@ -9,13 +10,20 @@
 
 struct sorting_scene
 {
-    struct window*        window;
-    struct iarr_graph*     graph;
-    insertion_sort_state_t state;
-    SDL_FRect         graph_base;
-    float    event_poll_interval;
-    float        update_interval;
-    bool                  runnig;
+    struct window*    window;
+    struct iarr_graph* graph;
+
+    enum SORTING_ALGO              current_algo;
+    void*                            algo_state;
+    bool (*algo_step)(struct int_array*, void*);
+    bool             (*algo_state_reset)(void*);
+
+    SDL_FRect graph_base;
+
+    float event_poll_interval;
+    float     update_interval;
+    bool               sorted;
+    bool               runnig;
 };
 
 bool sscene_init(struct sorting_scene* sscene);

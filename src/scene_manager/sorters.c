@@ -1,10 +1,31 @@
-#include "sorters.h"
+#include <errno.h>
 #include <stdbool.h>
+#include <stdlib.h>
+#include <string.h>
 
-void insertion_sort_step(struct int_array* iarr, insertion_sort_state_t* state)
+#include "../logger.h"
+#include "sorters.h"
+
+insertion_sort_state_t* insertion_sort_state_create(void)
 {
-    int temp          = 0;
-    size_t prev_index = 0;
+    insertion_sort_state_t* state = malloc(sizeof(insertion_sort_state_t));
+    if (!state)
+    {
+        LOGG_ERROR("malloc", errno, strerror(errno));
+        return NULL;
+    }
+
+    state->current_index = 1;
+
+    return state;
+}
+
+bool insertion_sort_step(struct int_array* iarr, void* _state)
+{
+    int temp                      = 0;
+    size_t prev_index             = 0;
+    bool sorted                   = false;
+    insertion_sort_state_t* state = _state;
 
     for (size_t j = state->current_index; j > 0; j--)
     {
@@ -20,11 +41,15 @@ void insertion_sort_step(struct int_array* iarr, insertion_sort_state_t* state)
     state->current_index++;
 
     if (state->current_index >= iarr->length)
-        state->sorted = true;
+        sorted = true;
+
+    return sorted;
 }
 
-void insertion_sort_reset_state(insertion_sort_state_t* state)
+bool insertion_sort_reset_state(void* _state)
 {
-    state->current_index = 1;
-    state->sorted        = false;
+    insertion_sort_state_t* state = _state;
+    state->current_index          = 1;
+
+    return false;
 }

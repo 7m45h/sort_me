@@ -1,6 +1,8 @@
+#include <SDL2/SDL.h>
 #include <SDL2/SDL_stdinc.h>
 #include <SDL2/SDL_timer.h>
 #include <stdbool.h>
+#include <stdlib.h>
 #include <time.h>
 
 #include "../logger.h"
@@ -38,7 +40,17 @@ bool sscene_init(struct sorting_scene* sscene)
         return true;
     }
 
-    insertion_sort_reset_state(&sscene->state);
+    sscene->current_algo     = SALGO_NONE;
+    sscene->algo_state       = NULL;
+    sscene->algo_step        = NULL;
+    sscene->algo_state_reset = NULL;
+
+    bool error = sscene_set_current_algo(sscene, SALGO_INSERTION);
+    if (error)
+    {
+        LOGG_FAILURE("sscene_set_current_algo");
+        return true;
+    }
 
     sscene->graph_base.x = 0;
     sscene->graph_base.y = 0;
@@ -56,6 +68,8 @@ void sscene_deinit(struct sorting_scene* sscene)
     window_destroy(sscene->window);
     iag_destroy(sscene->graph);
 
+    sscene_set_current_algo(sscene, SALGO_NONE);
+
     sscene->window = NULL;
     sscene->graph  = NULL;
     sscene->runnig = false;
@@ -63,12 +77,12 @@ void sscene_deinit(struct sorting_scene* sscene)
 
 void sscene_exist(struct sorting_scene* sscene)
 {
-    sscene->runnig = true;
-
     Uint64 frame_start_time = 0;
     Uint64 frame_duration   = 0;
     Uint64 event_ticker     = sscene->event_poll_interval;
     Uint64 update_ticker    = sscene->update_interval;
+
+    sscene->runnig = true;
 
     while (sscene->runnig)
     {
@@ -88,14 +102,14 @@ void sscene_exist(struct sorting_scene* sscene)
         {
             update_ticker = 0;
 
-            if (sscene->state.sorted)
+            if (sscene->sorted)
             {
-                insertion_sort_reset_state(&sscene->state);
+                sscene->sorted = sscene->algo_state_reset(sscene->algo_state);
                 int_array_suffle(sscene->graph->array);
             }
             else
             {
-                insertion_sort_step(sscene->graph->array, &sscene->state);
+                sscene->sorted = sscene->algo_step(sscene->graph->array, sscene->algo_state);
             }
 
             iag_update_rects(sscene->graph);

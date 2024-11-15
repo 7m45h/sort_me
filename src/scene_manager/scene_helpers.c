@@ -5,9 +5,13 @@
 #include <SDL2/SDL_surface.h>
 #include <SDL2/SDL_video.h>
 #include <stdbool.h>
+#include <stdlib.h>
 
 #include "../colors.h"
+#include "../logger.h"
 #include "scene_helpers.h"
+#include "sorters.h"
+#include "sorting_scene.h"
 
 void sscene_handle_events(struct sorting_scene* sscene)
 {
@@ -65,4 +69,40 @@ void sscene_alighn_items(struct sorting_scene* sscene)
     sscene->graph_base.y = sscene->graph->dimensions.y + sscene->graph->dimensions.h + sscene->graph->col_dimensions.y;
 
     iag_update_rects(sscene->graph);
+}
+
+bool sscene_set_current_algo(struct sorting_scene* sscene, enum SORTING_ALGO algo)
+{
+    bool error = false;
+
+    free(sscene->algo_state);
+
+    sscene->algo_state       = NULL;
+    sscene->algo_step        = NULL;
+    sscene->algo_state_reset = NULL;
+
+    switch (algo)
+    {
+        case SALGO_INSERTION:
+        sscene->algo_state = insertion_sort_state_create();
+        if (!sscene->algo_state)
+        {
+            LOGG_FAILURE("insertion_sort_state_create");
+            error = true;
+        }
+
+        sscene->current_algo     = algo;
+        sscene->algo_step        = &insertion_sort_step;
+        sscene->algo_state_reset = &insertion_sort_reset_state;
+        break;
+
+        case SALGO_NONE:
+        sscene->current_algo     = SALGO_NONE;
+        sscene->algo_state       = NULL;
+        sscene->algo_step        = NULL;
+        sscene->algo_state_reset = NULL;
+        break;
+    }
+
+    return error;
 }
