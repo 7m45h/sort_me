@@ -4,7 +4,7 @@ CC := gcc
 CPPFLAGS := -MMD
 CFLAGS := -Wall -Wextra -march=native
 LDFLAGS :=
-LIBS := sdl2
+LIBS := sdl2 SDL2_ttf
 
 ifdef LIBS
 CFLAGS += $(shell pkg-config --cflags ${LIBS})

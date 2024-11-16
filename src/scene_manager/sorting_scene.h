@@ -4,6 +4,7 @@
 #include <SDL2/SDL_rect.h>
 #include <stdbool.h>
 
+#include "../textbox/textbox.h"
 #include "../iarr_graph/iarr_graph.h"
 #include "../window/window.h"
 #include "sorters.h"
@@ -17,6 +18,7 @@ struct sorting_scene
     void*                            algo_state;
     bool (*algo_step)(struct int_array*, void*);
     bool             (*algo_state_reset)(void*);
+    struct textbox*                       title;
 
     SDL_FRect graph_base;
 

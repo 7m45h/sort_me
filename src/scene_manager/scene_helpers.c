@@ -6,6 +6,7 @@
 #include <SDL2/SDL_video.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include "../colors.h"
 #include "../logger.h"
@@ -68,6 +69,7 @@ void sscene_update_screen(struct sorting_scene* sscene)
     SDL_SetRenderDrawColor(sscene->window->renderer, COLOR_WHITE);
     SDL_RenderFillRectsF(sscene->window->renderer, sscene->graph->rects, sscene->graph->array->length);
     SDL_RenderFillRectF(sscene->window->renderer, &sscene->graph_base);
+    SDL_RenderCopyF(sscene->window->renderer, sscene->title->texture, NULL, &sscene->title->dimensions);
 
     SDL_RenderPresent(sscene->window->renderer);
 }
@@ -79,6 +81,9 @@ void sscene_alighn_items(struct sorting_scene* sscene)
 
     sscene->graph_base.x = (sscene->window->dimensions.x - sscene->graph_base.w) * 0.5;
     sscene->graph_base.y = sscene->graph->dimensions.y + sscene->graph->dimensions.h + sscene->graph->col_dimensions.y;
+
+    sscene->title->dimensions.x = (sscene->window->dimensions.x - sscene->title->dimensions.w) * 0.5;
+    sscene->title->dimensions.y = sscene->graph_base.y + sscene->graph_base.h + sscene->graph->col_dimensions.y;
 
     iag_update_rects(sscene->graph);
 }
@@ -101,6 +106,12 @@ bool sscene_set_current_algo(struct sorting_scene* sscene, enum SORTING_ALGO alg
         {
             LOGG_FAILURE("insertion_sort_state_create");
             error = true;
+        }
+
+        error = textbox_update(sscene->title, sscene->window->renderer, "insertion sort");
+        if (error)
+        {
+            LOGG_FAILURE("textbox_update");
         }
 
         sscene->current_algo     = algo;

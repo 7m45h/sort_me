@@ -3,6 +3,7 @@
 #include <SDL2/SDL_events.h>
 #include <SDL2/SDL_mouse.h>
 #include <SDL2/SDL_render.h>
+#include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_video.h>
 #include <errno.h>
 #include <stdbool.h>
@@ -34,6 +35,14 @@ struct window* window_create(const char* title)
     if (sdl_error)
     {
         LOGG_ERROR("SDL_Init", sdl_error, SDL_GetError());
+        window_destroy(window);
+        return NULL;
+    }
+
+    sdl_error = TTF_Init();
+    if (sdl_error)
+    {
+        LOGG_ERROR("TTF_Init", sdl_error, TTF_GetError());
         window_destroy(window);
         return NULL;
     }
@@ -76,6 +85,7 @@ void window_destroy(struct window* window)
 
     free(window);
 
+    TTF_Quit();
     SDL_Quit();
 }
 

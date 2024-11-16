@@ -5,25 +5,32 @@
 #include <stdlib.h>
 #include <time.h>
 
+#include "../colors.h"
 #include "../logger.h"
 #include "scene_helpers.h"
 #include "sorters.h"
 #include "sorting_scene.h"
 
+#define DEFAULT_GRAPH_COL_COUNT 32
+#define DEFAULT_GRAPH_COL_H      8
+#define DEFAULT_GRAPH_COL_W     16
+#define DEFAULT_SORTING_SPEED    2
+
 #define DEFAULT_TITLE "sort me"
 
-#define DEFAULT_GRAPH_COL_COUNT 32
-#define DEFAULT_GRAPH_COL_W     16
-#define DEFAULT_GRAPH_COL_H      8
+#define FONT_PATH "./assets/terminus.ttf"
+#define FONT_SIZE 32
 
 #define ONE_SEC_IN_MILI 1000.0f
 
-#define DEFAULT_SORTING_SPEED 2
-
 bool sscene_init(struct sorting_scene* sscene)
 {
-    sscene->window = NULL;
-    sscene->graph  = NULL;
+    sscene->window           = NULL;
+    sscene->graph            = NULL;
+    sscene->algo_state       = NULL;
+    sscene->algo_step        = NULL;
+    sscene->algo_state_reset = NULL;
+    sscene->title            = NULL;
 
     sscene->window = window_create(DEFAULT_TITLE);
     if (!sscene->window)
@@ -39,10 +46,12 @@ bool sscene_init(struct sorting_scene* sscene)
         return true;
     }
 
-    sscene->current_algo     = SALGO_NONE;
-    sscene->algo_state       = NULL;
-    sscene->algo_step        = NULL;
-    sscene->algo_state_reset = NULL;
+    sscene->title = textbox_create(FONT_PATH, FONT_SIZE, COLOR_WHITE);
+    if (!sscene->title)
+    {
+        LOGG_FAILURE("textbox_create");
+        return true;
+    }
 
     bool error = sscene_set_current_algo(sscene, SALGO_INSERTION);
     if (error)
@@ -66,6 +75,8 @@ bool sscene_init(struct sorting_scene* sscene)
 
 void sscene_deinit(struct sorting_scene* sscene)
 {
+    textbox_destroy(sscene->title);
+
     window_destroy(sscene->window);
     iag_destroy(sscene->graph);
 
