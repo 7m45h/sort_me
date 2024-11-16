@@ -14,6 +14,8 @@
 #include "sorters.h"
 #include "sorting_scene.h"
 
+static const int salgo_count = SALGO_COUNT;
+
 bool sscene_handle_events(struct sorting_scene* sscene)
 {
     bool error = false;
@@ -38,6 +40,22 @@ bool sscene_handle_events(struct sorting_scene* sscene)
                 if (error)
                 {
                     LOGG_FAILURE("window_toggle_fullscreen");
+                }
+                break;
+
+                case SDLK_h:
+                error = sscene_set_current_algo(sscene, ((sscene->current_algo - 1) + salgo_count) % salgo_count);
+                if (error)
+                {
+                    LOGG_FAILURE("sscene_set_current_algo");
+                }
+                break;
+
+                case SDLK_l:
+                error = sscene_set_current_algo(sscene, ((sscene->current_algo + 1) + salgo_count) % salgo_count);
+                if (error)
+                {
+                    LOGG_FAILURE("sscene_set_current_algo");
                 }
                 break;
             }
@@ -136,13 +154,6 @@ bool sscene_set_current_algo(struct sorting_scene* sscene, enum SORTING_ALGO alg
         sscene->current_algo     = algo;
         sscene->algo_step        = &selection_sort_step;
         sscene->algo_state_reset = &selection_sort_reset_state;
-        break;
-
-        case SALGO_NONE:
-        sscene->current_algo     = SALGO_NONE;
-        sscene->algo_state       = NULL;
-        sscene->algo_step        = NULL;
-        sscene->algo_state_reset = NULL;
         break;
     }
 

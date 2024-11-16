@@ -5,11 +5,12 @@
 
 #include "../int_array/int_array.h"
 
+#define SALGO_COUNT 2
+
 enum SORTING_ALGO
 {
-    SALGO_NONE      = 0,
-    SALGO_INSERTION = 1,
-    SALGO_SELECTION = 2
+    SALGO_INSERTION = 0,
+    SALGO_SELECTION = 1
 };
 
 typedef struct

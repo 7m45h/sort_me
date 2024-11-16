@@ -75,12 +75,11 @@ bool sscene_init(struct sorting_scene* sscene)
 
 void sscene_deinit(struct sorting_scene* sscene)
 {
+    free(sscene->algo_state);
     textbox_destroy(sscene->title);
 
     window_destroy(sscene->window);
     iag_destroy(sscene->graph);
-
-    sscene_set_current_algo(sscene, SALGO_NONE);
 
     sscene->window = NULL;
     sscene->graph  = NULL;
