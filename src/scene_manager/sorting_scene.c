@@ -53,7 +53,7 @@ bool sscene_init(struct sorting_scene* sscene)
         return true;
     }
 
-    bool error = sscene_set_current_algo(sscene, SALGO_INSERTION);
+    bool error = sscene_set_current_algo(sscene, SALGO_SELECTION);
     if (error)
     {
         LOGG_FAILURE("sscene_set_current_algo");

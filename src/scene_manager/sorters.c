@@ -53,3 +53,56 @@ bool insertion_sort_reset_state(void* _state)
 
     return false;
 }
+
+selection_sort_state_t* selection_sort_state_create(size_t iarr_length)
+{
+    selection_sort_state_t* state = malloc(sizeof(selection_sort_state_t));
+    if (!state)
+    {
+        LOGG_ERROR("malloc", errno, strerror(errno));
+        return NULL;
+    }
+
+    state->current_index = 0;
+    state->i_limit       = iarr_length - 1;
+
+    return state;
+}
+
+bool selection_sort_step(struct int_array* iarr, void* _state)
+{
+    selection_sort_state_t* state = _state;
+    size_t current_min_index      = state->current_index;
+    bool sorted                   = false;
+    int temp                      = 0;
+
+    for (size_t j = state->current_index + 1; j < iarr->length; j++)
+    {
+        if (iarr->data[j] < iarr->data[current_min_index])
+        {
+            current_min_index = j;
+        }
+    }
+
+    if (current_min_index != state->current_index)
+    {
+        temp                             = iarr->data[state->current_index];
+        iarr->data[state->current_index] = iarr->data[current_min_index];
+        iarr->data[current_min_index]    = temp;
+    }
+
+    state->current_index++;
+
+    if (state->current_index >= state->i_limit)
+        sorted = true;
+
+    return sorted;
+}
+
+bool selection_sort_reset_state(void* _state)
+{
+    selection_sort_state_t* state = _state;
+    state->current_index          = 0;
+
+    return false;
+}

@@ -119,6 +119,25 @@ bool sscene_set_current_algo(struct sorting_scene* sscene, enum SORTING_ALGO alg
         sscene->algo_state_reset = &insertion_sort_reset_state;
         break;
 
+        case SALGO_SELECTION:
+        sscene->algo_state = selection_sort_state_create(sscene->graph->array->length);
+        if (!sscene->algo_state)
+        {
+            LOGG_FAILURE("selection_sort_state_create");
+            error = true;
+        }
+
+        error = textbox_update(sscene->title, sscene->window->renderer, "selection sort");
+        if (error)
+        {
+            LOGG_FAILURE("textbox_update");
+        }
+
+        sscene->current_algo     = algo;
+        sscene->algo_step        = &selection_sort_step;
+        sscene->algo_state_reset = &selection_sort_reset_state;
+        break;
+
         case SALGO_NONE:
         sscene->current_algo     = SALGO_NONE;
         sscene->algo_state       = NULL;
